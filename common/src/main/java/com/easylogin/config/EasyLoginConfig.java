@@ -38,6 +38,7 @@ public class EasyLoginConfig {
     public boolean blockChat = true;
     public boolean blockDamageReceived = true;
     public boolean blockDamageDealt = true;
+    public int invincibilityDuration = 5;
 
     // ─── Sounds ─────────────────────────────────────────────
     public String soundLoginSuccess = "minecraft:entity.player.levelup";
@@ -128,6 +129,7 @@ public class EasyLoginConfig {
             blockChat = getBool(protection, "blockChat", blockChat);
             blockDamageReceived = getBool(protection, "blockDamageReceived", blockDamageReceived);
             blockDamageDealt = getBool(protection, "blockDamageDealt", blockDamageDealt);
+            invincibilityDuration = getInt(protection, "invincibilityDuration", invincibilityDuration);
 
             // Sounds
             Map<String, String> sounds = sections.getOrDefault("sounds", Map.of());
@@ -226,7 +228,9 @@ public class EasyLoginConfig {
             w.write("# Block damage received while unauthenticated\n");
             w.write("blockDamageReceived = " + blockDamageReceived + "\n");
             w.write("# Block damage dealt by unauthenticated players\n");
-            w.write("blockDamageDealt = " + blockDamageDealt + "\n\n");
+            w.write("blockDamageDealt = " + blockDamageDealt + "\n");
+            w.write("# Seconds of invincibility after successful login/register\n");
+            w.write("invincibilityDuration = " + invincibilityDuration + "\n\n");
 
             w.write("[sounds]\n");
             w.write("# Vanilla sound events\n");

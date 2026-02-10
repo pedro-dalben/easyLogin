@@ -56,14 +56,16 @@ public class ForgeEventHandler {
     public void onDamage(LivingDamageEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof ServerPlayer player) {
-            if (config.blockDamageReceived && protectionHandler.shouldBlock(player)) {
+            if ((config.blockDamageReceived && protectionHandler.shouldBlock(player))
+                    || authManager.isInvincible(player)) {
                 event.setCanceled(true);
                 return;
             }
         }
         Entity source = event.getSource().getEntity();
         if (source instanceof ServerPlayer attacker) {
-            if (config.blockDamageDealt && protectionHandler.shouldBlock(attacker)) {
+            if (config.blockDamageDealt
+                    && (protectionHandler.shouldBlock(attacker) || authManager.isInvincible(attacker))) {
                 event.setCanceled(true);
             }
         }

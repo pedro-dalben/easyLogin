@@ -23,6 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class AuthManager {
 
+    public static AuthManager INSTANCE;
+
     private final EasyLoginConfig config;
     private final PlayerDataStore dataStore;
     private final RateLimiter rateLimiter;
@@ -45,17 +47,32 @@ public class AuthManager {
     // Logout cooldown tracking
     private final Map<UUID, Long> logoutCooldowns = new ConcurrentHashMap<>();
 
+    // Invincibility after login tracking (UUID → Expiry Timestamp)
+    private final Map<UUID, Long> invincibilityExpiry = new ConcurrentHashMap<>();
+
     public AuthManager(EasyLoginConfig config, PlayerDataStore dataStore) {
         this.config = config;
         this.dataStore = dataStore;
         this.rateLimiter = new RateLimiter(config.maxAttempts, config.attemptWindow, config.lockoutDuration);
         this.formatter = new MessageFormatter(config);
+        INSTANCE = this;
     }
 
     // ─── State queries ──────────────────────────────────────
 
     public boolean isAuthenticated(ServerPlayer player) {
         return authenticated.contains(player.getUUID());
+    }
+
+    public boolean isInvincible(ServerPlayer player) {
+        Long expiry = invincibilityExpiry.get(player.getUUID());
+        if (expiry == null)
+            return false;
+        if (System.currentTimeMillis() >= expiry) {
+            invincibilityExpiry.remove(player.getUUID());
+            return false;
+        }
+        return true;
     }
 
     public boolean shouldBlock(ServerPlayer player) {
@@ -111,6 +128,7 @@ public class AuthManager {
         savedPositions.remove(uuid);
         savedDimensions.remove(uuid);
         logoutCooldowns.remove(uuid);
+        invincibilityExpiry.remove(uuid);
     }
 
     // ─── Login ──────────────────────────────────────────────
@@ -428,6 +446,11 @@ public class AuthManager {
         // Teleport back
         if (config.limboEnabled) {
             restorePlayerPosition(player);
+        }
+
+        // Set invincibility
+        if (config.invincibilityDuration > 0) {
+            invincibilityExpiry.put(uuid, System.currentTimeMillis() + (config.invincibilityDuration * 1000L));
         }
 
         // Clear title

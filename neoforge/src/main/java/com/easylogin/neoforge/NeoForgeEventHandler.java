@@ -63,16 +63,18 @@ public class NeoForgeEventHandler {
     public void onDamage(LivingDamageEvent.Pre event) {
         Entity entity = event.getEntity();
         if (entity instanceof ServerPlayer player) {
-            if (config.blockDamageReceived && protectionHandler.shouldBlock(player)) {
+            if ((config.blockDamageReceived && protectionHandler.shouldBlock(player))
+                    || authManager.isInvincible(player)) {
                 event.setNewDamage(0);
                 return;
             }
         }
 
-        // Block damage dealt by unauthenticated players
+        // Block damage dealt by unauthenticated or invincible players
         Entity source = event.getSource().getEntity();
         if (source instanceof ServerPlayer attacker) {
-            if (config.blockDamageDealt && protectionHandler.shouldBlock(attacker)) {
+            if (config.blockDamageDealt
+                    && (protectionHandler.shouldBlock(attacker) || authManager.isInvincible(attacker))) {
                 event.setNewDamage(0);
             }
         }
