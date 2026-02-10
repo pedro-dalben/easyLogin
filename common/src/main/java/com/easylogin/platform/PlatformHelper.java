@@ -26,4 +26,9 @@ public interface PlatformHelper {
      * Returns the platform's config directory path (e.g., config/).
      */
     Path getConfigDir();
+
+    /**
+     * Returns the world-specific config directory path (e.g., world/serverconfig/).
+     */
+    Path getWorldConfigDir(net.minecraft.server.MinecraftServer server);
 }

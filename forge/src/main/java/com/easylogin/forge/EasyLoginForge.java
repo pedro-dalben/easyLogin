@@ -11,7 +11,6 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 @Mod(EasyLoginConstants.MOD_ID)
 public class EasyLoginForge {
@@ -24,20 +23,22 @@ public class EasyLoginForge {
     public EasyLoginForge() {
         EasyLoginConstants.LOGGER.info("EasyLogin (Forge) initializing...");
 
+        config = new EasyLoginConfig(com.easylogin.platform.PlatformHelper.INSTANCE.getConfigDir());
+        config.load();
+
+        dataStore = new PlayerDataStore(com.easylogin.platform.PlatformHelper.INSTANCE.getConfigDir());
+        authManager = new AuthManager(config, dataStore);
+        protectionHandler = new ProtectionHandler(authManager);
+
         MinecraftForge.EVENT_BUS.addListener(this::onServerStarting);
         MinecraftForge.EVENT_BUS.addListener(this::onServerStopping);
         MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
     }
 
     private void onServerStarting(ServerStartingEvent event) {
-        config = new EasyLoginConfig(FMLPaths.CONFIGDIR.get());
-        config.load();
-
-        dataStore = new PlayerDataStore(FMLPaths.CONFIGDIR.get());
+        dataStore.setStoragePath(com.easylogin.platform.PlatformHelper.INSTANCE.getWorldConfigDir(event.getServer()));
+        dataStore.migrateIfNeeded(com.easylogin.platform.PlatformHelper.INSTANCE.getConfigDir());
         dataStore.load();
-
-        authManager = new AuthManager(config, dataStore);
-        protectionHandler = new ProtectionHandler(authManager);
 
         ForgeEventHandler handler = new ForgeEventHandler(authManager, protectionHandler, config);
         MinecraftForge.EVENT_BUS.register(handler);

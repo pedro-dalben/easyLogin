@@ -9,7 +9,6 @@ import com.easylogin.handler.ProtectionHandler;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.loader.api.FabricLoader;
 
 public class EasyLoginFabric implements DedicatedServerModInitializer {
 
@@ -22,15 +21,17 @@ public class EasyLoginFabric implements DedicatedServerModInitializer {
     public void onInitializeServer() {
         EasyLoginConstants.LOGGER.info("EasyLogin (Fabric) initializing...");
 
+        config = new EasyLoginConfig(com.easylogin.platform.PlatformHelper.INSTANCE.getConfigDir());
+        config.load();
+
+        dataStore = new PlayerDataStore(com.easylogin.platform.PlatformHelper.INSTANCE.getConfigDir());
+        authManager = new AuthManager(config, dataStore);
+        protectionHandler = new ProtectionHandler(authManager);
+
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-            config = new EasyLoginConfig(FabricLoader.getInstance().getConfigDir());
-            config.load();
-
-            dataStore = new PlayerDataStore(FabricLoader.getInstance().getConfigDir());
+            dataStore.setStoragePath(com.easylogin.platform.PlatformHelper.INSTANCE.getWorldConfigDir(server));
+            dataStore.migrateIfNeeded(com.easylogin.platform.PlatformHelper.INSTANCE.getConfigDir());
             dataStore.load();
-
-            authManager = new AuthManager(config, dataStore);
-            protectionHandler = new ProtectionHandler(authManager);
 
             // Register event handlers
             FabricEventHandler.register(authManager, protectionHandler, config);

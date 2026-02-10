@@ -21,4 +21,9 @@ public class NeoForgePlatformHelper implements PlatformHelper {
     public Path getConfigDir() {
         return FMLPaths.CONFIGDIR.get();
     }
+
+    @Override
+    public Path getWorldConfigDir(net.minecraft.server.MinecraftServer server) {
+        return server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).resolve("serverconfig");
+    }
 }

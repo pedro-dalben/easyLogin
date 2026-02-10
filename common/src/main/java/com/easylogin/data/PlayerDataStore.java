@@ -26,17 +26,53 @@ public class PlayerDataStore {
     private static final Type ACCOUNTS_TYPE = new TypeToken<Map<String, PlayerAccount>>() {
     }.getType();
 
-    private final Path dataFile;
-    private final Path tempFile;
-    private final Path backupFile;
+    private Path dataFile;
+    private Path tempFile;
+    private Path backupFile;
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final Map<String, PlayerAccount> accounts = new ConcurrentHashMap<>();
 
-    public PlayerDataStore(Path configDir) {
-        Path modDir = configDir.resolve("easylogin");
-        this.dataFile = modDir.resolve("players.json");
-        this.tempFile = modDir.resolve("players.json.tmp");
-        this.backupFile = modDir.resolve("players.json.bak");
+    public PlayerDataStore(Path storageDir) {
+        setStoragePath(storageDir);
+    }
+
+    /**
+     * Updates the storage path to a new directory. Useful for moving to
+     * world-specific storage.
+     */
+    public void setStoragePath(Path storageDir) {
+        lock.writeLock().lock();
+        try {
+            Path modDir = storageDir.resolve("easylogin");
+            this.dataFile = modDir.resolve("players.json");
+            this.tempFile = modDir.resolve("players.json.tmp");
+            this.backupFile = modDir.resolve("players.json.bak");
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * Migrates data from the old config directory to the new world directory if
+     * necessary.
+     */
+    public void migrateIfNeeded(Path oldConfigDir) {
+        Path oldModDir = oldConfigDir.resolve("easylogin");
+        Path oldFile = oldModDir.resolve("players.json");
+        Path oldBackup = oldModDir.resolve("players.json.bak");
+
+        if (Files.exists(oldFile) && !Files.exists(dataFile)) {
+            try {
+                Files.createDirectories(dataFile.getParent());
+                Files.move(oldFile, dataFile, StandardCopyOption.REPLACE_EXISTING);
+                if (Files.exists(oldBackup)) {
+                    Files.move(oldBackup, backupFile, StandardCopyOption.REPLACE_EXISTING);
+                }
+                EasyLoginConstants.LOGGER.info("Successfully migrated player data from {} to {}", oldFile, dataFile);
+            } catch (IOException e) {
+                EasyLoginConstants.LOGGER.error("Failed to migrate player data", e);
+            }
+        }
     }
 
     /**

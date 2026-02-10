@@ -36,4 +36,9 @@ public class FabricPlatformHelper implements PlatformHelper {
     public Path getConfigDir() {
         return FabricLoader.getInstance().getConfigDir();
     }
+
+    @Override
+    public Path getWorldConfigDir(net.minecraft.server.MinecraftServer server) {
+        return server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).resolve("serverconfig");
+    }
 }
