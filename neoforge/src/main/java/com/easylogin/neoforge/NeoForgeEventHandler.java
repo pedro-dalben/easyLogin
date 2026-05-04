@@ -143,6 +143,7 @@ public class NeoForgeEventHandler {
         if (event.getPlayer() instanceof ServerPlayer player) {
             if (protectionHandler.shouldBlock(player)) {
                 event.setCanceled(true);
+                player.getInventory().add(event.getEntity().getItem());
             }
         }
     }
