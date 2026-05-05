@@ -4,7 +4,8 @@ plugins {
 }
 
 base {
-    archivesName = "${mod_id}-${project.name}-${minecraft_version}"
+    def libs = project.extensions.getByType(org.gradle.api.artifacts.VersionCatalogsExtension).named("libs")
+    archivesName = "${mod_id}-${project.name}-${libs.findVersion('minecraft').get().requiredVersion}"
 }
 
 java {
@@ -40,9 +41,10 @@ repositories {
 }
 
 ['apiElements', 'runtimeElements', 'sourcesElements'].each { variant ->
+    def libs = project.extensions.getByType(org.gradle.api.artifacts.VersionCatalogsExtension).named("libs")
     configurations."$variant".outgoing {
         capability("$group:${base.archivesName.get()}:$version")
-        capability("$group:$mod_id-${project.name}-${minecraft_version}:$version")
+        capability("$group:$mod_id-${project.name}-${libs.findVersion('minecraft').get().requiredVersion}:$version")
         capability("$group:$mod_id:$version")
     }
     publishing.publications.configureEach {
@@ -69,28 +71,29 @@ jar {
                 'Implementation-Title'  : project.name,
                 'Implementation-Version': project.jar.archiveVersion,
                 'Implementation-Vendor' : mod_author,
-                'Built-On-Minecraft'    : minecraft_version
+                'Built-On-Minecraft'    : project.extensions.getByType(org.gradle.api.artifacts.VersionCatalogsExtension).named("libs").findVersion('minecraft').get().requiredVersion
         ])
     }
 }
 
 processResources {
+    def libs = project.extensions.getByType(org.gradle.api.artifacts.VersionCatalogsExtension).named("libs")
     var expandProps = [
             'version'                      : version,
             'group'                        : project.group,
-            'minecraft_version'            : minecraft_version,
-            'minecraft_version_range'      : minecraft_version_range,
-            'fabric_version'               : fabric_version,
-            'fabric_loader_version'        : fabric_loader_version,
+            'minecraft_version'            : libs.findVersion('minecraft').get().requiredVersion,
+            'minecraft_version_range'      : "[${libs.findVersion('minecraft').get().requiredVersion}, 1.22)",
+            'fabric_version'               : libs.findVersion('fabric-api').get().requiredVersion,
+            'fabric_loader_version'        : libs.findVersion('fabric-loader').get().requiredVersion,
             'mod_name'                     : mod_name,
             'mod_author'                   : mod_author,
             'mod_id'                       : mod_id,
             'license'                      : license,
             'description'                  : project.description,
-            'neoforge_version'             : neoforge_version,
-            'neoforge_loader_version_range': neoforge_loader_version_range,
-            "forge_version"                : forge_version,
-            "forge_loader_version_range"   : forge_loader_version_range,
+            'neoforge_version'             : libs.findVersion('neoforge').get().requiredVersion,
+            'neoforge_loader_version_range': "[4,)",
+            "forge_version"                : libs.findVersion('forge').get().requiredVersion,
+            "forge_loader_version_range"   : "[52,)",
             'credits'                      : credits,
             'java_version'                 : java_version
     ]
