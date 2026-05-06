@@ -1,29 +1,24 @@
-# Fase 3: Centralizar Versões
+# Fase 3: Migração de API (1.21.1 -> 1.21.11)
 
-**Objetivo:** Evitar duplicação de versão entre Gradle, properties e metadados dos loaders, consolidando tudo num *Version Catalog* (`libs.versions.toml`).
+Nesta fase, resolvemos as quebras de API introduzidas pelo Minecraft 1.21.11, utilizando condicionais do Stonecutter para manter a compatibilidade com a 1.21.1.
 
-## Passos Realizados
-1.  **Criação do Version Catalog:** Criado `gradle/libs.versions.toml` contendo todas as dependências do mod, ferramentas do Gradle, versões do Minecraft, Parchment, NeoForge, Fabric e Forge.
-2.  **Limpeza do `gradle.properties`:** Removidas todas as chaves de versão hardcoded (`minecraft_version`, `fabric_version`, etc) que geravam duplicação.
-3.  **Atualização de Build Scripts:**
-    *   Substituídas as referências `group: '...', name: '...', version: '...'` por `libs.mixin`, `libs.bcrypt`, etc, no `common/build.gradle`, `fabric/build.gradle`, `neoforge/build.gradle` e `forge/build.gradle`.
-    *   Corrigido uso do plugin Loom no root.
-4.  **Injeção de Metadados (`buildSrc`):**
-    *   Atualizado o script `multiloader-common.gradle` para extrair os valores do `libs.versions.toml` e passá-los dinamicamente para o `expandProps` do `processResources`.
-    *   **Resultado:** Agora os arquivos `fabric.mod.json`, `mods.toml`, `neoforge.mods.toml` e mixins recebem a versão automaticamente do TOML.
+## Quebras de API Resolvidas
+
+### 1. ResourceLocation para Identifier
+O Minecraft renomeou `ResourceLocation` para `Identifier` em pacotes e classes.
+- **Solução**: Uso de `//? if` para importar a classe correta e instanciar usando os nomes específicos de cada versão.
+
+### 2. Sistema de Permissões
+O acesso a níveis de comando mudou de simples `int` para um sistema baseado em `PermissionSet`.
+- **Solução**: Refatoração do `AuthCommand` para usar `Permission.HasCommandLevel` na 1.21.11 e verificações manuais na 1.21.1.
+
+### 3. Teleportação de Jogadores
+A assinatura do método `teleportTo` no `ServerPlayer` mudou drasticamente (passando de 3 para 8 argumentos).
+- **Solução**: Implementação de condicionais no `AuthManager` e `PlayerUtil` para passar o `ServerLevel`, flags de movimento e parâmetros de orientação exigidos pela nova API.
+
+### 4. Sistema de Sons
+Mudanças no escopo de som em entidades exigiram o uso de `level().playSound(...)` em vez de métodos diretos de notificação.
 
 ## Resultados
-A arquitetura de build está madura e modernizada. Todo o gerenciamento de dependências e metadados agora reside num único arquivo limpo, prevenindo erros de esquecimento em atualizações futuras.
-
-*   **Arquivos Alterados:**
-    *   `gradle/libs.versions.toml` (Novo)
-    *   `gradle.properties`
-    *   `build.gradle` (Root)
-    *   `common/build.gradle`
-    *   `fabric/build.gradle`
-    *   `neoforge/build.gradle`
-    *   `forge/build.gradle`
-    *   `buildSrc/src/main/groovy/multiloader-common.gradle`
-*   **Comandos Executados:** `./gradlew build`
-*   **Resultado do build/testes:** `BUILD SUCCESSFUL in 13s` em todos os loaders.
-*   **Status:** Concluído com Sucesso. A estrutura está livre de duplicações.
+- Código-fonte único capaz de compilar para ambas as versões com zero duplicação de lógica de negócios.
+- Garantia de que bugs corrigidos em uma versão serão automaticamente aplicados na outra.

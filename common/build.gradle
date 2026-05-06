@@ -1,6 +1,25 @@
 plugins {
     id 'multiloader-common'
-    id 'net.neoforged.moddev'
+    alias(libs.plugins.neoforged.moddev)
+    id 'dev.kikugie.stonecutter'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ["../../src/main/java"]
+        }
+        resources {
+            srcDirs = ["../../src/main/resources"]
+        }
+    }
+}
+
+def minecraft_version = stonecutter.current.version == "26.1" ? libs.versions.minecraft26.get() : (stonecutter.current.version == "1.21.11" ? libs.versions.minecraft11.get() : libs.versions.minecraft.get())
+def java_version = stonecutter.current.version == "26.1" ? 25 : 21
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version)
 }
 
 neoForge {
@@ -9,10 +28,12 @@ neoForge {
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
     }
+/*
     parchment {
         minecraftVersion = libs.versions.parchment.minecraft.get()
         mappingsVersion = libs.versions.parchment.mappings.get()
     }
+*/
 }
 
 dependencies {
@@ -20,22 +41,6 @@ dependencies {
     compileOnly libs.mixinextras
     annotationProcessor libs.mixinextras
 
-    // BCrypt - pure Java, no native deps
+    implementation libs.jetbrains.annotations
     implementation libs.bcrypt
-}
-
-configurations {
-    commonJava {
-        canBeResolved = false
-        canBeConsumed = true
-    }
-    commonResources {
-        canBeResolved = false
-        canBeConsumed = true
-    }
-}
-
-artifacts {
-    commonJava sourceSets.main.java.sourceDirectories.singleFile
-    commonResources sourceSets.main.resources.sourceDirectories.singleFile
 }

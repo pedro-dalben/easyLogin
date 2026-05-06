@@ -29,11 +29,21 @@ public class AuthCommand {
         dispatcher.register(Commands.literal("auth")
                 // /auth status
                 .then(Commands.literal("status")
-                        .requires(src -> src.hasPermission(2))
+                        .requires(src -> {
+                            //? if <=1.21.1 {
+                            /*return src.hasPermission(2);
+                            *///?} else {
+                            return src.permissions().hasPermission(new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.byId(2)));
+                            //?}
+                        })
                         .executes(ctx -> {
                             CommandSourceStack source = ctx.getSource();
                             int total = authManager.getDataStore().getAccountCount();
+                            //? if <=1.21.1 {
+                            /*int online = source.getServer().getPlayerCount();
+                            *///?} else {
                             int online = source.getServer().getPlayerCount();
+                            //?}
                             source.sendSuccess(() -> Component.literal(
                                     "§6[EasyLogin] §7Registered accounts: §e" + total +
                                             " §7| Online: §e" + online),
@@ -43,7 +53,13 @@ public class AuthCommand {
 
                 // /auth reload
                 .then(Commands.literal("reload")
-                        .requires(src -> src.hasPermission(3))
+                        .requires(src -> {
+                            //? if <=1.21.1 {
+                            /*return src.hasPermission(3);
+                            *///?} else {
+                            return src.permissions().hasPermission(new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.byId(3)));
+                            //?}
+                        })
                         .executes(ctx -> {
                             reloadAction.run();
                             ctx.getSource().sendSuccess(() -> Component.literal(
@@ -55,7 +71,13 @@ public class AuthCommand {
 
                 // /auth force-login <player>
                 .then(Commands.literal("force-login")
-                        .requires(src -> src.hasPermission(3))
+                        .requires(src -> {
+                            //? if <=1.21.1 {
+                            /*return src.hasPermission(3);
+                            *///?} else {
+                            return src.permissions().hasPermission(new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.byId(3)));
+                            //?}
+                        })
                         .then(Commands.argument("target", EntityArgument.player())
                                 .executes(ctx -> {
                                     ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
@@ -70,7 +92,13 @@ public class AuthCommand {
 
                 // /auth force-register <player> <password>
                 .then(Commands.literal("force-register")
-                        .requires(src -> src.hasPermission(3))
+                        .requires(src -> {
+                            //? if <=1.21.1 {
+                            /*return src.hasPermission(3);
+                            *///?} else {
+                            return src.permissions().hasPermission(new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.byId(3)));
+                            //?}
+                        })
                         .then(Commands.argument("target", EntityArgument.player())
                                 .then(Commands.argument("password", StringArgumentType.word())
                                         .executes(ctx -> {
@@ -87,7 +115,13 @@ public class AuthCommand {
 
                 // /auth reset-password <player>
                 .then(Commands.literal("reset-password")
-                        .requires(src -> src.hasPermission(3))
+                        .requires(src -> {
+                            //? if <=1.21.1 {
+                            /*return src.hasPermission(3);
+                            *///?} else {
+                            return src.permissions().hasPermission(new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.byId(3)));
+                            //?}
+                        })
                         .then(Commands.argument("target", EntityArgument.player())
                                 .executes(ctx -> {
                                     ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
@@ -108,7 +142,13 @@ public class AuthCommand {
 
                 // /auth purge <player>
                 .then(Commands.literal("purge")
-                        .requires(src -> src.hasPermission(3))
+                        .requires(src -> {
+                            //? if <=1.21.1 {
+                            /*return src.hasPermission(3);
+                            *///?} else {
+                            return src.permissions().hasPermission(new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.byId(3)));
+                            //?}
+                        })
                         .then(Commands.argument("target", EntityArgument.player())
                                 .executes(ctx -> {
                                     ServerPlayer target = EntityArgument.getPlayer(ctx, "target");

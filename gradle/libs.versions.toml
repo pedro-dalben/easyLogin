@@ -1,19 +1,26 @@
 [versions]
 # Minecraft
-minecraft = "1.21.1"
+minecraft = "1.21.11"
+minecraft11 = "1.21.11"
 parchment-minecraft = "1.21"
 parchment-mappings = "2024.11.10"
 
 # Loaders & APIs
-neoforge = "21.1.80"
-neoform = "1.21.1-20240808.144430"
-fabric-api = "0.109.0+1.21.1"
+neoforge = "21.11.42"
+neoforge11 = "21.11.42"
+neoform = "1.21.11-20251209.172050"
+fabric-api = "0.141.3+1.21.11"
+fabric-api11 = "0.141.3+1.21.11"
 fabric-loader = "0.16.9"
 forge = "52.0.28"
+minecraft26 = "26.1.1"
+neoforge26 = "26.1.1.15-beta"
+neoform26 = "26.1.1-20260501.120000" # Placeholder baseado no padrão
+
 
 # Tooling
 fabric-loom = "1.8.13"
-neogradle = "2.0.49-beta"
+neogradle = "2.0.141"
 mixin = "0.8.5"
 mixinextras = "0.3.5"
 
@@ -28,6 +35,7 @@ mixin = { module = "org.spongepowered:mixin", version.ref = "mixin" }
 mixinextras = { module = "io.github.llamalad7:mixinextras-common", version.ref = "mixinextras" }
 bcrypt = { module = "at.favre.lib:bcrypt", version.ref = "bcrypt" }
 bytes = { module = "at.favre.lib:bytes", version.ref = "bytes" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version = "24.1.0" }
 
 [plugins]
 fabric-loom = { id = "fabric-loom", version.ref = "fabric-loom" }

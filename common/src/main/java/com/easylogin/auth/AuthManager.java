@@ -9,7 +9,11 @@ import com.easylogin.util.MessageFormatter;
 import com.easylogin.util.PlayerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+//? if <=1.21.1 {
+/*import net.minecraft.resources.ResourceLocation;
+*///?} else {
+import net.minecraft.resources.Identifier;
+//?}
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -476,7 +480,11 @@ public class AuthManager {
                 player.getYRot(), player.getXRot()
         });
         savedDimensions.put(player.getUUID(),
-                player.level().dimension().location().toString());
+                //? if <=1.21.1 {
+                /*player.level().dimension().location().toString());
+                *///?} else {
+                player.level().dimension().identifier().toString());
+                //?}
     }
 
     private void restorePlayerPosition(ServerPlayer player) {
@@ -484,18 +492,37 @@ public class AuthManager {
         String dim = savedDimensions.remove(player.getUUID());
 
         if (pos != null && dim != null) {
-            MinecraftServer server = player.getServer();
+            //? if <=1.21.1 {
+            /*MinecraftServer server = player.getServer();
+            *///?} else {
+            MinecraftServer server = player.level().getServer();
+            //?}
             if (server != null) {
-                ResourceLocation dimRL = ResourceLocation.parse(dim);
+                //? if <=1.21.1 {
+                /*ResourceLocation dimRL = ResourceLocation.parse(dim);
+                *///?} else {
+                Identifier dimRL = Identifier.parse(dim);
+                //?}
                 for (ServerLevel level : server.getAllLevels()) {
-                    if (level.dimension().location().equals(dimRL)) {
+                    //? if <=1.21.1 {
+                    /*if (level.dimension().location().equals(dimRL)) {
                         player.teleportTo(level, pos[0], pos[1], pos[2], (float) pos[3], (float) pos[4]);
                         return;
                     }
+                    *///?} else {
+                    if (level.dimension().identifier().equals(dimRL)) {
+                        player.teleportTo(level, pos[0], pos[1], pos[2], java.util.Set.of(), (float) pos[3], (float) pos[4], true);
+                        return;
+                    }
+                    //?}
                 }
             }
             // Fallback: just teleport in current dimension
-            player.teleportTo(pos[0], pos[1], pos[2]);
+            //? if <=1.21.1 {
+            /*player.teleportTo(pos[0], pos[1], pos[2]);
+            *///?} else {
+            player.teleportTo((ServerLevel) player.level(), pos[0], pos[1], pos[2], java.util.Set.of(), (float) pos[3], (float) pos[4], true);
+            //?}
         }
     }
 

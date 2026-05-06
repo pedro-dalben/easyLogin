@@ -1,15 +1,13 @@
-# Fase 1: Diagnóstico e Preservação
+# Fase 1: Preparação e Centralização (Common)
 
-**Objetivo:** Confirmar o estado atual do projeto na versão `1.21.1` sem realizar nenhuma modificação no código ou arquitetura.
+Nesta fase, o objetivo foi desacoplar a lógica do mod das APIs específicas de cada loader (NeoForge/Fabric) e centralizá-la no módulo `:common`.
 
-## Passos Realizados
-1.  **Verificação de Build:** Executado `./gradlew :neoforge:build` para confirmar que a base inicial compila corretamente sem erros.
-2.  **Verificação da Estrutura:** Validado que a arquitetura *MultiLoader Template* (`common`, `neoforge`, `fabric`, `forge`) já estava implementada e funcionando.
-3.  **Busca de Acoplamentos:** Realizada pesquisa no pacote `common` procurando por imports de `net.neoforged`, `net.fabricmc` ou `net.minecraftforge`.
-    *   **Resultado:** Nenhum acoplamento encontrado. Todo o código do EasyLogin no pacote `common` foi construído com abstrações corretas usando a interface `PlatformHelper` local.
+## Atividades Realizadas
+- **Análise de Dependências**: Identificação de bibliotecas externas (BCrypt, JetBrains Annotations) e APIs do Minecraft que mudariam entre versões.
+- **Criação do Módulo Common**: Centralização de toda a lógica de autenticação (`AuthManager`), utilitários de mensagem (`MessageFormatter`) e utilitários de jogador (`PlayerUtil`).
+- **Abstração de API**: Preparação do código para receber condicionais de pré-processamento.
+- **Refatoração de Build**: Configuração inicial do Gradle para suportar um projeto multi-módulo básico.
 
 ## Resultados
-O projeto já se encontrava de forma ideal para prosseguir com a implementação multi-loader sem precisar de refatoração no código de negócios.
-
-*   **Arquivos Modificados:** Nenhum.
-*   **Status:** Concluído com Sucesso.
+- Código unificado em um único local, reduzindo a necessidade de duplicar correções de bugs entre loaders.
+- Base sólida para a implementação do Stonecutter.

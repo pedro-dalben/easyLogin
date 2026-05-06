@@ -37,10 +37,17 @@ public class MessageFormatter {
         result = result.replace("{discord}", config.discordLink);
 
         // Server stats
-        if (player.getServer() != null) {
+        //? if <=1.21.1 {
+        /*if (player.getServer() != null) {
             result = result.replace("{online}",
                     String.valueOf(player.getServer().getPlayerCount()));
         }
+        *///?} else {
+        if (player.level().getServer() != null) {
+            result = result.replace("{online}",
+                    String.valueOf(player.level().getServer().getPlayerCount()));
+        }
+        //?}
 
         // Extra placeholders
         for (Map.Entry<String, String> entry : extra.entrySet()) {

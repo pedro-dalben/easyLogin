@@ -1,18 +1,44 @@
 plugins {
     id 'multiloader-loader'
-    id 'net.neoforged.moddev'
+    alias(libs.plugins.neoforged.moddev)
+    id 'dev.kikugie.stonecutter'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ["../../src/main/java", "../../../common/src/main/java"]
+        }
+        resources {
+            srcDirs = ["../../src/main/resources", "../../../common/src/main/resources"]
+        }
+    }
+}
+
+dependencies {
+    implementation libs.bcrypt
+}
+
+def minecraft_version = stonecutter.current.version == "26.1" ? libs.versions.minecraft26.get() : (stonecutter.current.version == "1.21.11" ? libs.versions.minecraft11.get() : libs.versions.minecraft.get())
+def neoforge_version = stonecutter.current.version == "26.1" ? libs.versions.neoforge26.get() : (stonecutter.current.version == "1.21.11" ? libs.versions.neoforge11.get() : libs.versions.neoforge.get())
+def java_version = stonecutter.current.version == "26.1" ? 25 : 21
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version)
 }
 
 neoForge {
-    version = libs.versions.neoforge.get()
+    version = neoforge_version
     def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
     }
+/*
     parchment {
         minecraftVersion = libs.versions.parchment.minecraft.get()
         mappingsVersion = libs.versions.parchment.mappings.get()
     }
+*/
     runs {
         configureEach {
             systemProperty('neoforge.enabledGameTestNamespaces', mod_id)

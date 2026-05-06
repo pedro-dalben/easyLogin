@@ -1,15 +1,13 @@
-# Fase 2: Consolidação 1.21.1
+# Fase 2: Implementação do Stonecutter
 
-**Objetivo:** Garantir a funcionalidade das instâncias Fabric e Forge, baseando-se na estabilidade provada da Fase 1, e determinar a viabilidade do Forge.
+A Fase 2 focou na implementação do **Stonecutter 0.6.1** para gerenciar múltiplas versões do Minecraft simultaneamente.
 
-## Passos Realizados
-1.  **Fabric:** Executado `./gradlew :fabric:build`.
-    *   **Resultado:** Compilou perfeitamente em 8 segundos sem nenhuma modificação. O `PlatformHelper` nativo supriu todas as necessidades para Fabric 1.21.1.
-2.  **Forge:** Executado `./gradlew :forge:build`.
-    *   **Resultado:** Compilou e processou os Mixins (SpongePowered) com sucesso em 9 segundos. A arquitetura base do MultiLoader Template e os mappings (`createMcpToSrg`) operaram corretamente "out of the box".
+## Atividades Realizadas
+- **Configuração do Stonecutter**: Registro de cadeias de versão (chains) no `settings.gradle` para os módulos `:common` e `:neoforge`.
+- **Criação de Variantes**: Inicialização das pastas de versão (`versions/1.21.1` e `versions/1.21.11`) que funcionam como projetos Gradle independentes mas compartilham o mesmo código-fonte.
+- **Integração com BuildSrc**: Centralização da lógica de plugins (Loom, ModDev) no `buildSrc` para garantir consistência entre as versões.
+- **Ativação de Condicionais**: Configuração do ambiente para reconhecer diretivas `//? if` e `//? else`.
 
 ## Resultados
-Como a compilação passou nativamente sem bagunçar a arquitetura ou exigir *hacks* no código `common`, ambas as plataformas foram oficialmente validadas para a âncora `1.21.1`.
-
-*   **Arquivos Modificados:** Nenhum.
-*   **Status:** Concluído com Sucesso. A âncora 1.21.1 está estabelecida em NeoForge, Fabric e Forge.
+- Capacidade de alternar o contexto de desenvolvimento entre versões (`./gradlew chv <version>`).
+- Estrutura de diretórios organizada para suportar futuras versões (ex: 26.1.x) sem poluir a raiz do projeto.
