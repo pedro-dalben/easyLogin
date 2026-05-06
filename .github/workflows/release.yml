@@ -43,11 +43,8 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
         
-      - name: Switch Stonecutter
-        run: ./gradlew chv ${{ matrix.version }}
-        
       - name: Build
-        run: ./gradlew assemble --no-daemon
+        run: ./gradlew :neoforge:${{ matrix.version }}:assemble --no-daemon
         
       - name: Upload temporary artifacts
         uses: actions/upload-artifact@v4

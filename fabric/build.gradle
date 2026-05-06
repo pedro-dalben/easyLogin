@@ -1,16 +1,31 @@
 plugins {
     id 'multiloader-loader'
-    id 'fabric-loom'
+    alias(libs.plugins.fabric.loom)
+    id 'dev.kikugie.stonecutter'
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ["../../src/main/java", "../../../common/src/main/java"]
+        }
+        resources {
+            srcDirs = ["../../src/main/resources", "../../../common/src/main/resources"]
+        }
+    }
+}
+
+def minecraft_version = stonecutter.current.version == "1.21.11" ? libs.versions.minecraft11.get() : libs.versions.minecraft.get()
+def fabric_api_version = stonecutter.current.version == "1.21.11" ? libs.versions.fabric.api11.get() : libs.versions.fabric.api.get()
+// Nota: 26.1 não tem fabric oficial configurado ainda no libs.toml, vamos focar em 1.21.x para fabric.
+
 dependencies {
-    minecraft "com.mojang:minecraft:${libs.versions.minecraft.get()}"
+    minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered {
         officialMojangMappings()
-        // parchment("org.parchmentmc.data:parchment-${libs.versions.parchment.minecraft.get()}:${libs.versions.parchment.mappings.get()}@zip")
     }
     modImplementation libs.fabric.loader
-    modImplementation libs.fabric.api
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
 
     // BCrypt
     implementation libs.bcrypt

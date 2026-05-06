@@ -60,4 +60,6 @@ stonecutter {
 }
 stonecutter.create(rootProject)
 stonecutter.create(project(':common'))
+// stonecutter.create(project(':fabric'))
 stonecutter.create(project(':neoforge'))
+// stonecutter.create(project(':forge'))
