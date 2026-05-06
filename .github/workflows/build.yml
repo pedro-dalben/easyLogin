@@ -8,28 +8,45 @@ on:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [1.21.1, 1.21.11, 26.1]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up JDK 21
+    - name: Determine JDK Version
+      id: jdk
+      run: |
+        if [[ "${{ matrix.version }}" == "26.1" ]]; then
+          echo "version=25" >> $GITHUB_OUTPUT
+        else
+          echo "version=21" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Set up JDK ${{ steps.jdk.outputs.version }}
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
+        java-version: ${{ steps.jdk.outputs.version }}
         distribution: 'temurin'
         cache: 'gradle'
         
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
+    - name: Switch Stonecutter Version
+      run: ./gradlew chv ${{ matrix.version }}
+      
     - name: Build with Gradle
-      run: ./gradlew assemble
+      run: ./gradlew assemble --no-daemon
       
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: EasyLogin-Jars
+        name: EasyLogin-${{ matrix.version }}-Jars
         path: |
-          neoforge/build/libs/*.jar
-          forge/build/libs/*.jar
-          fabric/build/libs/*.jar
+          **/build/libs/*.jar
+          !**/build/libs/*-dev.jar
+          !**/build/libs/*-sources.jar
+          !**/build/libs/*-common.jar
